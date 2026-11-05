@@ -1,0 +1,73 @@
+[batch 2026-09-18 19:06:07] GPU: GPU 0: NVIDIA GeForce RTX 5090 (UUID: GPU-f0905242-d69a-8e25-9360-935c43c9f9e6)
+[batch 2026-09-18 19:06:08] baseline ckpt = work_dir/floe_b2_dlr_cv5_f0_s42/best_model_floe_b2_dlr_cv5_f0_s42.pth
+[batch 2026-09-18 19:06:08] pgsg     ckpt = work_dir/floe_b2_pgsg4_cv5f0_s42/best_model_floe_b2_pgsg4_cv5f0_s42.pth
+[batch 2026-09-18 19:06:08] start  S smoke 证据消融(3景)
+[batch 2026-09-18 19:07:37] exit=0  S smoke 证据消融(3景)   (log: /root/autodl-tmp/logs/paper_evabl_smoke.log)
+[batch 2026-09-18 19:08:07] 冒烟通过：control 与各变体都跑通
+[batch 2026-09-18 19:08:07] start  0-1 PGSG 辐射敏感度
+[batch 2026-09-18 19:29:22] exit=0  0-1 PGSG 辐射敏感度   (log: /root/autodl-tmp/logs/paper_radio_pgsg4_f0.log)
+[batch 2026-09-18 19:29:52] start  0-2 证据消融(全量)
+[batch 2026-09-18 20:01:24] exit=0  0-2 证据消融(全量)   (log: /root/autodl-tmp/logs/paper_evabl_pgsg4_f0.log)
+[batch 2026-09-18 20:01:54] start  0-6 训练景评估(334景)
+[batch 2026-09-18 20:24:08] exit=0  0-6 训练景评估(334景)   (log: /root/autodl-tmp/logs/paper_traineval_f0.log)
+[batch 2026-09-18 20:24:38] 全部完成，汇总关键数字：
+=========== 0-1 PGSG 辐射敏感度（与基线对照）===========
+[基线 fold0 已测：id hard-ice 0.2243；b+0.30 Δ−0.0386；b−0.30 Δ−0.0543]
+variant      macro hard-ice     Δhard |  water   cake  small medium    big   vast
+================================================================================================
+id          0.5109   0.2302   +0.0000 |  0.968  0.088  0.231  0.229  0.676  0.874
+b+0.15      0.4972   0.2348   +0.0046 |  0.963  0.090  0.245  0.224  0.635  0.825
+b-0.15      0.4868   0.2086   -0.0216 |  0.964  0.071  0.199  0.218  0.636  0.832
+b+0.30      0.4422   0.2034   -0.0267 |  0.946  0.084  0.230  0.176  0.583  0.634
+b-0.30      0.4491   0.1888   -0.0413 |  0.954  0.056  0.174  0.204  0.506  0.800
+a0.90       0.5126   0.2269   -0.0033 |  0.966  0.093  0.234  0.220  0.695  0.868
+a1.10       0.5092   0.2341   +0.0039 |  0.969  0.085  0.227  0.241  0.660  0.873
+================================================================================================
+参照 id: macro=0.5109 hard-ice=0.2302（83 景）
+读法：Δhard 明显负且随 |b| 单调加深 ⇒ 模型依赖绝对辐射水平（H1 成立，不变性线有靶子）；Δhard ≈ 0 ⇒ 捷径不存在（H1 否掉）。参考噪声带：baseline 两 seed 的 hard-ice 差 0.005。
+RADIO_EVAL_DONE
+
+=========== 0-2 证据消融 ===========
+variant             macro    Δmacro  hard-ice     Δhard |  Water   Cake  Small Medium    Big   Vast
+========================================================================================================
+control            0.5109   +0.0000    0.2302   +0.0000 |  0.968  0.088  0.231  0.229  0.676  0.874
+sub-all/both       0.5101   -0.0009    0.2297   -0.0005 |  0.967  0.088  0.228  0.231  0.674  0.872
+sub-vario/both     0.5111   +0.0002    0.2301   -0.0001 |  0.968  0.088  0.231  0.229  0.676  0.874
+sub-pol/both       0.5099   -0.0010    0.2298   -0.0003 |  0.967  0.089  0.229  0.231  0.674  0.870
+sub-all/gate       0.5110   +0.0001    0.2305   +0.0003 |  0.968  0.088  0.231  0.230  0.676  0.873
+sub-all/xattn      0.5100   -0.0009    0.2294   -0.0008 |  0.967  0.088  0.229  0.230  0.674  0.872
+========================================================================================================
+读法：
+  Δ ≈ 0（在 run 间噪声 ~0.005 内）⇒ 训练好的模型推理时【已不依赖】该路证据，
+      与 Fig. 6 的贡献比衰减互相印证，构成一个完整的机制性负结果；
+  Δ 明显为负 ⇒ 贡献比低估了证据的作用，证据仍在携带关键信息。
+  vario vs pol 的对比回答"两条物理先验哪条还在被用"——
+  ⚠️ 仅限"推理期依赖"，不等于"从头不带那一路重训"的结论。
+
+per-scene CM -> /root/autodl-tmp/cm/evabl/pgsg4_f0.npz
+
+EVIDENCE_ABLATION_DONE
+
+=========== 0-6 训练景 vs 验证景 ===========
+[fold0 val 83 景已测：medium IoU 0.229、small 0.220、macro 0.5031]
+  FLOE mIoU:        0.3808
+  Class                     IoU       F1     Prec      Rec    True%    Pred%
+  FLOE mIoU:        0.3271
+  Class                     IoU       F1     Prec      Rec    True%    Pred%
+  FLOE mIoU:        0.3717
+  Class                     IoU       F1     Prec      Rec    True%    Pred%
+  FLOE mIoU:        0.3959
+  Class                     IoU       F1     Prec      Rec    True%    Pred%
+  FLOE mIoU:        0.2871
+  Class                     IoU       F1     Prec      Rec    True%    Pred%
+  FLOE mIoU:        0.2801
+  Class                     IoU       F1     Prec      Rec    True%    Pred%
+  FLOE mIoU:        0.2499
+  Class                     IoU       F1     Prec      Rec    True%    Pred%
+  FLOE mIoU:        0.3362
+  Class                     IoU       F1     Prec      Rec    True%    Pred%
+  FLOE mIoU:        0.7655
+  Class                     IoU       F1     Prec      Rec    True%    Pred%
+  Scene                                             mIoU    F1(w)       OA
+  self-check: mIoU from summed per-scene CM = 0.765536  (global above = 0.765536)
+[batch 2026-09-18 20:24:38] PAPER_GPU_BATCH_DONE

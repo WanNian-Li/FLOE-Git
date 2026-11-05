@@ -1,0 +1,497 @@
+/root/miniconda3/envs/ice-binary/lib/python3.10/site-packages/mmcv/__init__.py:20: UserWarning: On January 1, 2023, MMCV will release v2.0.0, in which it will remove components related to the training process and add a data transformation module. In addition, it will rename the package names mmcv to mmcv-lite and mmcv-full to mmcv. See https://github.com/open-mmlab/mmcv/blob/master/docs/en/compatibility.md for more details.
+  warnings.warn(
+/root/miniconda3/envs/ice-binary/lib/python3.10/site-packages/timm/models/layers/__init__.py:49: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+config: configs/FLOE/sota_segformer_in1k_dlr_cv5f0_pgsg4.py
+ckpt  : work_dir/floe_b2_pgsg4_cv5f0_s42/best_model_floe_b2_pgsg4_cv5f0_s42.pth
+evidence_ch=96  scale_gate=有  scale_xattn=有
+验证集：83 景
+
+[1/2] 估计证据逐通道均值（前 8 景）…
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+[VarioTexture] γ 分位数 p1/p50/p99 = 0.000e+00/6.647e-03/3.057e-02 (ε=1e-06，p1 应远大于 ε) | ε 有效域占比 97.3% | clamp(±6) 命中率(仅有效域) 0.257% (应 ≪1%；命中=该 lag 通道剖面被截断、失去对 γ 比值的分辨力。clamp 是 1-Lipschitz、不破坏不变性)
+[VarioTexture] 剖面 radii=(1, 2, 4, 8, 16) 逐 lag 均值 = [-0.46, -0.197, -0.09, 0.035, 0.178] | 跨 lag std p50/p90 = 0.183/0.478 (★ p50 ≲0.05 = 剖面被压平、模块没在说话，此时空结果【不能】读成"该 lag 带无信号")
+[ScaleXAttn] #1 (val): ‖resid‖/‖feat‖ = 0.6016（趋 0=通信结果被闲置） | 尺度→证据注意力份额 0.214（均匀基线 0.200）
+[SegformerHead] gate #1 (val): stage-mean g = [1.027, 0.985, 0.997, 0.991] | 选择熵 1.338/1.386 nats（≈上限=没在选尺度） | |a|=0.275 T=1 | 证据/特征激活贡献比 0.078（趋 0=证据被闲置；升=门控在听证据） | conv1 权重 RMS f 0.0208 / e 0.0185
+  [mean] scene 1/8
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+  [mean] scene 2/8
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+  [mean] scene 3/8
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+  [mean] scene 4/8
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+  [mean] scene 5/8
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+  [mean] scene 6/8
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+  [mean] scene 7/8
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+  [mean] scene 8/8
+  证据逐通道均值：vario |mean| 均值 0.1260，pol |mean| 均值 0.5154
+
+[2/2] 跑 6 个变体 × 83 景…
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20220712T200455_20220712T20 hard-ice control=0.279 all=0.272 vario=0.276 pol=0.274 all=0.278 all=0.273
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+[ScaleXAttn] #100 (val): ‖resid‖/‖feat‖ = 0.6257（趋 0=通信结果被闲置） | 尺度→证据注意力份额 0.245（均匀基线 0.200）
+[SegformerHead] gate #100 (val): stage-mean g = [1.092, 0.882, 0.961, 1.064] | 选择熵 1.338/1.386 nats（≈上限=没在选尺度） | |a|=0.274 T=1 | 证据/特征激活贡献比 0.100（趋 0=证据被闲置；升=门控在听证据） | conv1 权重 RMS f 0.0208 / e 0.0185
+S1A_EW_GRDM_1SDH_20220717T201310_20220717T20 hard-ice control=0.080 all=0.075 vario=0.080 pol=0.076 all=0.078 all=0.078
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20220724T200456_20220724T20 hard-ice control=0.063 all=0.061 vario=0.064 pol=0.061 all=0.062 all=0.063
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20220726T083024_20220726T08 hard-ice control=0.368 all=0.368 vario=0.369 pol=0.368 all=0.368 all=0.368
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230317T203708_20230317T20 hard-ice control=0.007 all=0.007 vario=0.007 pol=0.007 all=0.007 all=0.007
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230403T190837_20230403T19 hard-ice control=0.500 all=0.500 vario=0.500 pol=0.500 all=0.500 all=0.500
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230406T081328_20230406T08 hard-ice control=0.477 all=0.476 vario=0.477 pol=0.476 all=0.478 all=0.476
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230420T075559_20230420T07 hard-ice control=0.190 all=0.190 vario=0.190 pol=0.190 all=0.191 all=0.189
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230425T080356_20230425T08 hard-ice control=0.008 all=0.011 vario=0.008 pol=0.013 all=0.014 all=0.005
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230428T194830_20230428T19 hard-ice control=0.205 all=0.209 vario=0.207 pol=0.206 all=0.202 all=0.211
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230504T203605_20230504T20 hard-ice control=0.000 all=0.000 vario=0.000 pol=0.000 all=0.000 all=0.000
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230504T203710_20230504T20 hard-ice control=0.003 all=0.003 vario=0.004 pol=0.002 all=0.003 all=0.003
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230612T080359_20230612T08 hard-ice control=0.154 all=0.153 vario=0.155 pol=0.152 all=0.152 all=0.154
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230612T080459_20230612T08 hard-ice control=0.279 all=0.283 vario=0.281 pol=0.281 all=0.280 all=0.282
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230612T174743_20230612T17 hard-ice control=0.006 all=0.006 vario=0.007 pol=0.006 all=0.006 all=0.006
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230630T201214_20230630T20 hard-ice control=0.012 all=0.011 vario=0.012 pol=0.011 all=0.012 all=0.011
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+[ScaleXAttn] #1000 (val): ‖resid‖/‖feat‖ = 0.5861（趋 0=通信结果被闲置） | 尺度→证据注意力份额 0.170（均匀基线 0.200）
+[SegformerHead] gate #1000 (val): stage-mean g = [1.070, 1.075, 0.940, 0.914] | 选择熵 1.353/1.386 nats（≈上限=没在选尺度） | |a|=0.210 T=1 | 证据/特征激活贡献比 0.095（趋 0=证据被闲置；升=门控在听证据） | conv1 权重 RMS f 0.0208 / e 0.0185
+S1A_EW_GRDM_1SDH_20230630T201314_20230630T20 hard-ice control=0.098 all=0.096 vario=0.098 pol=0.096 all=0.096 all=0.097
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230709T181128_20230709T18 hard-ice control=0.318 all=0.318 vario=0.316 pol=0.321 all=0.317 all=0.320
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230709T194834_20230709T19 hard-ice control=0.273 all=0.272 vario=0.272 pol=0.274 all=0.274 all=0.272
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230709T194934_20230709T19 hard-ice control=0.452 all=0.453 vario=0.452 pol=0.452 all=0.452 all=0.453
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20230719T200501_20230719T20 hard-ice control=0.001 all=0.001 vario=0.001 pol=0.001 all=0.001 all=0.001
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20231119T140527_20231119T14 hard-ice control=0.000 all=0.000 vario=0.000 pol=0.000 all=0.000 all=0.000
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20231220T202055_20231220T20 hard-ice control=0.297 all=0.294 vario=0.297 pol=0.295 all=0.297 all=0.295
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20231228T075606_20231228T07 hard-ice control=0.000 all=0.000 vario=0.000 pol=0.000 all=0.000 all=0.000
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240129T115017_20240129T11 hard-ice control=0.000 all=0.000 vario=0.000 pol=0.000 all=0.000 all=0.000
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240222T194834_20240222T19 hard-ice control=0.025 all=0.023 vario=0.025 pol=0.023 all=0.025 all=0.023
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240303T200400_20240303T20 hard-ice control=0.054 all=0.048 vario=0.054 pol=0.049 all=0.053 all=0.050
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240430T201950_20240430T20 hard-ice control=0.293 all=0.294 vario=0.293 pol=0.293 all=0.294 all=0.293
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240430T202055_20240430T20 hard-ice control=0.067 all=0.071 vario=0.067 pol=0.071 all=0.070 all=0.069
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240513T174745_20240513T17 hard-ice control=0.304 all=0.306 vario=0.306 pol=0.304 all=0.305 all=0.305
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240527T190738_20240527T19 hard-ice control=0.002 all=0.002 vario=0.002 pol=0.002 all=0.002 all=0.002
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240527T190843_20240527T19 hard-ice control=0.105 all=0.101 vario=0.105 pol=0.102 all=0.104 all=0.103
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240531T201216_20240531T20 hard-ice control=0.258 all=0.259 vario=0.258 pol=0.258 all=0.258 all=0.259
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240531T201316_20240531T20 hard-ice control=0.045 all=0.045 vario=0.045 pol=0.045 all=0.045 all=0.045
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240607T200401_20240607T20 hard-ice control=0.380 all=0.382 vario=0.380 pol=0.383 all=0.380 all=0.382
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240607T200501_20240607T20 hard-ice control=0.034 all=0.034 vario=0.034 pol=0.034 all=0.034 all=0.034
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240619T200400_20240619T20 hard-ice control=0.135 all=0.136 vario=0.135 pol=0.136 all=0.136 all=0.135
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240619T200500_20240619T20 hard-ice control=0.014 all=0.014 vario=0.014 pol=0.014 all=0.014 all=0.014
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240701T200359_20240701T20 hard-ice control=0.216 all=0.216 vario=0.215 pol=0.217 all=0.214 all=0.217
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240701T200459_20240701T20 hard-ice control=0.201 all=0.199 vario=0.201 pol=0.200 all=0.200 all=0.200
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240706T201214_20240706T20 hard-ice control=0.095 all=0.095 vario=0.095 pol=0.095 all=0.095 all=0.096
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240706T201314_20240706T20 hard-ice control=0.326 all=0.322 vario=0.325 pol=0.323 all=0.324 all=0.324
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240717T081132_20240717T08 hard-ice control=0.154 all=0.151 vario=0.155 pol=0.150 all=0.152 all=0.153
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240717T081332_20240717T08 hard-ice control=0.038 all=0.035 vario=0.038 pol=0.034 all=0.037 all=0.036
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240719T075603_20240719T07 hard-ice control=0.203 all=0.204 vario=0.203 pol=0.204 all=0.204 all=0.203
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240719T075703_20240719T07 hard-ice control=0.188 all=0.194 vario=0.189 pol=0.194 all=0.191 all=0.191
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240818T200459_20240818T20 hard-ice control=0.000 all=0.000 vario=0.000 pol=0.000 all=0.000 all=0.000
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240903T081132_20240903T08 hard-ice control=0.021 all=0.019 vario=0.021 pol=0.019 all=0.021 all=0.019
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20240910T174848_20240910T17 hard-ice control=0.193 all=0.193 vario=0.193 pol=0.193 all=0.193 all=0.193
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20250116T195643_20250116T19 hard-ice control=0.511 all=0.510 vario=0.511 pol=0.510 all=0.510 all=0.510
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20250119T201943_20250119T20 hard-ice control=0.002 all=0.002 vario=0.002 pol=0.002 all=0.002 all=0.002
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20250119T202048_20250119T20 hard-ice control=0.151 all=0.155 vario=0.152 pol=0.153 all=0.152 all=0.154
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20250202T200454_20250202T20 hard-ice control=0.000 all=0.000 vario=0.000 pol=0.000 all=0.000 all=0.000
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20250401T201943_20250401T20 hard-ice control=0.006 all=0.007 vario=0.006 pol=0.007 all=0.006 all=0.007
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20250401T202047_20250401T20 hard-ice control=0.011 all=0.012 vario=0.011 pol=0.012 all=0.011 all=0.012
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20250403T200354_20250403T20 hard-ice control=0.198 all=0.191 vario=0.198 pol=0.192 all=0.196 all=0.193
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20250403T200454_20250403T20 hard-ice control=0.113 all=0.108 vario=0.112 pol=0.109 all=0.114 all=0.108
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20250507T201943_20250507T20 hard-ice control=0.296 all=0.291 vario=0.297 pol=0.291 all=0.295 all=0.292
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20250609T195641_20250609T19 hard-ice control=0.227 all=0.232 vario=0.228 pol=0.232 all=0.229 all=0.231
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20250622T203705_20250622T20 hard-ice control=0.103 all=0.099 vario=0.103 pol=0.099 all=0.105 all=0.097
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20251107T082925_20251107T08 hard-ice control=0.032 all=0.035 vario=0.033 pol=0.035 all=0.034 all=0.034
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20251130T160023_20251130T16 hard-ice control=0.000 all=0.000 vario=0.000 pol=0.000 all=0.000 all=0.000
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20260428T205324_20260428T20 hard-ice control=0.004 all=0.007 vario=0.005 pol=0.007 all=0.005 all=0.006
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20260522T205219_20260522T20 hard-ice control=0.016 all=0.014 vario=0.016 pol=0.014 all=0.015 all=0.014
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20260522T205324_20260522T20 hard-ice control=0.000 all=0.000 vario=0.000 pol=0.000 all=0.000 all=0.000
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20260604T195629_20260604T19 hard-ice control=0.062 all=0.061 vario=0.061 pol=0.061 all=0.061 all=0.062
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20260614T201155_20260614T20 hard-ice control=0.136 all=0.129 vario=0.136 pol=0.130 all=0.134 all=0.131
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1A_EW_GRDM_1SDH_20260614T201255_20260614T20 hard-ice control=0.337 all=0.337 vario=0.337 pol=0.336 all=0.338 all=0.336
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20250506T202720_20250506T20 hard-ice control=0.307 all=0.308 vario=0.307 pol=0.308 all=0.307 all=0.308
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20250513T202003_20250513T20 hard-ice control=0.406 all=0.419 vario=0.410 pol=0.417 all=0.411 all=0.416
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20250525T090308_20250525T09 hard-ice control=0.000 all=0.000 vario=0.000 pol=0.000 all=0.000 all=0.000
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20250525T090408_20250525T09 hard-ice control=0.095 all=0.096 vario=0.095 pol=0.097 all=0.096 all=0.096
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20250606T201906_20250606T20 hard-ice control=0.072 all=0.068 vario=0.071 pol=0.069 all=0.070 all=0.070
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20250606T202006_20250606T20 hard-ice control=0.080 all=0.087 vario=0.081 pol=0.087 all=0.085 all=0.082
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20250618T201906_20250618T20 hard-ice control=0.000 all=0.000 vario=0.000 pol=0.000 all=0.000 all=0.000
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20250618T202006_20250618T20 hard-ice control=0.003 all=0.003 vario=0.003 pol=0.003 all=0.003 all=0.003
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20260318T195517_20260318T19 hard-ice control=0.227 all=0.227 vario=0.228 pol=0.227 all=0.229 all=0.224
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20260428T200336_20260428T20 hard-ice control=0.133 all=0.131 vario=0.133 pol=0.130 all=0.131 all=0.133
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20260522T200238_20260522T20 hard-ice control=0.024 all=0.022 vario=0.024 pol=0.022 all=0.024 all=0.022
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20260522T200338_20260522T20 hard-ice control=0.155 all=0.151 vario=0.154 pol=0.151 all=0.154 all=0.151
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20260527T085532_20260527T08 hard-ice control=0.347 all=0.346 vario=0.346 pol=0.347 all=0.348 all=0.345
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20260527T201056_20260527T20 hard-ice control=0.308 all=0.305 vario=0.308 pol=0.305 all=0.307 all=0.306
+/root/code/FLOE-Detection/_paper_gpu_ablation_evidence.py:243: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.no_grad(), torch.cuda.amp.autocast():
+/root/code/FLOE-Detection/models/sota/segformer.py:546: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=False):
+S1C_EW_GRDM_1SDH_20260529T195521_20260529T19 hard-ice control=0.232 all=0.228 vario=0.232 pol=0.229 all=0.231 all=0.229
+
+========================================================================================================
+variant             macro    Δmacro  hard-ice     Δhard |  Water   Cake  Small Medium    Big   Vast
+========================================================================================================
+control            0.5109   +0.0000    0.2302   +0.0000 |  0.968  0.088  0.231  0.229  0.676  0.874
+sub-all/both       0.5101   -0.0009    0.2297   -0.0005 |  0.967  0.088  0.228  0.231  0.674  0.872
+sub-vario/both     0.5111   +0.0002    0.2301   -0.0001 |  0.968  0.088  0.231  0.229  0.676  0.874
+sub-pol/both       0.5099   -0.0010    0.2298   -0.0003 |  0.967  0.089  0.229  0.231  0.674  0.870
+sub-all/gate       0.5110   +0.0001    0.2305   +0.0003 |  0.968  0.088  0.231  0.230  0.676  0.873
+sub-all/xattn      0.5100   -0.0009    0.2294   -0.0008 |  0.967  0.088  0.229  0.230  0.674  0.872
+========================================================================================================
+读法：
+  Δ ≈ 0（在 run 间噪声 ~0.005 内）⇒ 训练好的模型推理时【已不依赖】该路证据，
+      与 Fig. 6 的贡献比衰减互相印证，构成一个完整的机制性负结果；
+  Δ 明显为负 ⇒ 贡献比低估了证据的作用，证据仍在携带关键信息。
+  vario vs pol 的对比回答"两条物理先验哪条还在被用"——
+  ⚠️ 仅限"推理期依赖"，不等于"从头不带那一路重训"的结论。
+
+per-scene CM -> /root/autodl-tmp/cm/evabl/pgsg4_f0.npz
+
+EVIDENCE_ABLATION_DONE

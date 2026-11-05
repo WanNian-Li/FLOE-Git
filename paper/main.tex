@@ -1,0 +1,1223 @@
+%% =====================================================================
+%%  PGSG manuscript -- Elsevier (elsarticle)
+%%
+%%  Drafting mode: single column, 12pt. For the final two-column form,
+%%  swap the \documentclass line for:
+%%      \documentclass[final,5p,times,twocolumn,authoryear]{elsarticle}
+%%  and re-check that Table 3 still fits (it will need \small or a
+%%  table* float).
+%%
+%%  Sections written: Introduction, Related Work, Data and Pre-processing,
+%%  Method. Everything after that is a skeleton.
+%%
+%%  Every [TODO] marks a number, citation or figure that is deliberately
+%%  left empty. None of them has been filled from memory or inference.
+%% =====================================================================
+
+\documentclass[preprint,12pt,authoryear]{elsarticle}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage[protrusion=true,expansion=false]{microtype}
+\emergencystretch=2em
+
+%% Figure files are supplied separately; the author sets the directory, e.g.
+%% \graphicspath{{figures/}}
+
+%% \journal{[TODO: target journal]}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Physics-Guided Scale Gating for Floe-Size Segmentation in
+Sentinel-1 EW SAR Imagery}
+
+\author[zju]{Wannian Li}
+\author[zju]{Yudi Wang}
+\author[zju]{Huanhao Liao}
+\author[zju]{Yifang Luo}
+\author[zju]{Hang Diao}
+\author[zju]{Jiale Chen}
+\author[zju]{Zixiong Ma}
+\author[zju]{Ziyi Zhu}
+\author[zju]{Yihe Wang}
+\author[zju]{Fan Zhang\corref{cor1}}
+\ead{f.zhang@zju.edu.cn}
+\cortext[cor1]{Corresponding author.}
+
+\affiliation[zju]{organization={State Key Laboratory of Ocean Sensing \& Ocean
+                                College, Zhejiang University},
+                  city={Zhoushan},
+                  postcode={316021},
+                  state={Zhejiang},
+                  country={China}}
+
+\begin{abstract}
+[TODO: abstract. Best written last, since its strength of claim depends on the
+five-fold paired result. It must stay consistent with the narrative of the
+Results section: a consistent but moderate overall gain, the largest
+single-class gain on big floe, no improvement on medium floe, and a readout
+showing that the evidence contribution to the gate decays over training.]
+\end{abstract}
+
+\begin{keyword}
+sea ice \sep floe size distribution \sep synthetic aperture radar \sep
+semantic segmentation \sep physics-guided learning \sep cross-scene generalization
+\end{keyword}
+
+\end{frontmatter}
+
+%% =====================================================================
+\section{Introduction}
+\label{sec:intro}
+%% =====================================================================
+
+The sea-ice Flee Size Distribution (FSD) describes how an ice cover is partitioned among floes of different horizontal extent. It enters sea-ice dynamics and thermodynamics through lateral melt, floe--floe interaction and
+wave--ice coupling, and prognostic FSD schemes are now being incorporated into coupled models \citep{rothrock1984measuring,horvat2015prognostic,bateson2022floe}.
+Observational FSD records remain sparse, assembled largely from high-resolution imagery that is localised in space and time \citep{toyota2006characteristics,stern2018seasonal,stern2018reconciling}, which limits the evaluation of those schemes \citep{horvat2019estimating}. Synthetic aperture radar (SAR) images the polar oceans independently of cloud cover and
+illumination, and Sentinel-1 provides routine dual-polarisation coverage of the Arctic marginal ice zone \citep{torres2012sentinel1}. Producing per-pixel floe size maps from SAR is therefore a necessary component of automated operational ice charting, in which floe size is one of the coded attributes of the SIGRID-3 standard \citep{jcomm2010sigrid3,stokholm2024autoice}.
+
+Floe size classes differ from most semantic categories in one respect that shapes everything downstream: they are defined purely by physical scale. We follow the operational coding and use six classes --- open water; cake ice($<20$~m); small floe (20--100~m); medium floe (100--500~m); big floe(0.5--2~km); and vast floe (2--10~km). At the 80~m output pixel spacing used here for Sentinel-1 Extra Wide (EW)
+swath GRDM imagery, an individual small or medium floe spans
+only about one to six pixels (Fig.~\ref{fig:task}). A pixel-level label is thus not a statement about brightness, nor about the semantic appearance of an object; it is a statement
+about the spatial scale of the local texture. The task is, at bottom,
+\emph{per-pixel scale inference}: estimating the characteristic scale of the neighbourhood around each pixel and mapping it onto an interval. General-purpose segmentation networks treat scale as one implicit property among many, learned inside features that are also carrying appearance and context. That is a structural mismatch with a task whose label set \emph{is} a partition of the scale axis.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig1_task.pdf}
+\caption{The task. (a) A $41\times41$~km Sentinel-1 EW HH subset of the marginal ice zone.
+(b) The corresponding floe size label; labels are constant within an ice-chart polygon, so the
+supervision is regional rather than per-floe. (c) The six classes partition a physical scale
+axis; the dashed line marks the processed 80~m pixel spacing, which falls inside the small-floe interval,
+so individual small and medium floes span only about one to six pixels.}
+\label{fig:task}
+\end{figure}
+
+To locate where a strong general-purpose model fails here, we ran a set of
+diagnostic probes on a SegFormer-B2 baseline. Unless stated otherwise, every
+model-side number in this paper is measured on fold~0 of the five-fold
+cross-validation described in Section~\ref{sec:splits}. Two failure modes stand
+out. The first concerns the \emph{quality} of the evidence. Medium floe reaches
+an IoU of 0.6693 when the retained baseline checkpoint is evaluated on all
+334 training scenes, compared with approximately 0.229 on the 83 held-out
+validation scenes, a gap of approximately 0.440. These are scene-level
+evaluation results using the same checkpoint, rather than training-batch
+metrics. This places the failure in
+cross-scene generalization rather than in model capacity --- consistent with
+evidence that high-scoring sea-ice charting models can lean on scene- or
+location-specific cues and transfer poorly to unseen regions
+\citep{jalayer2025enhancing}. At the same time, the absolute radiometric level
+varies widely between scenes: over our 417 scenes the standard deviation of the
+per-scene mean HH backscatter is approximately 3~dB. The baseline's scale
+reading is sensitive to that level. A uniform shift of about 2~dB applied to a
+scene lowers hard-ice mIoU by 0.04--0.05, an order of magnitude more than the
+0.005 difference between two random seeds of the same baseline. On individual
+scenes the effect can be severe: Fig.~\ref{fig:radiometric} shows a fold-0
+validation scene in which darkening the input by about 4~dB causes a tongue of
+medium floe to be read as open water, taking the medium-floe IoU for that scene
+from 0.76 to 0.03. Here and throughout, \emph{hard-ice mIoU}
+denotes the mean of the small-floe and medium-floe IoU; we introduce it as a
+diagnostic quantity for the two hard ice classes in this work, not as a
+standard metric of the field. The picture these probes give is that the scale
+evidence is contaminated by radiometric conditions.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig2_radiometric.pdf}
+\caption{Scale reading is entangled with the absolute radiometric level. All four panels show
+the same scene and the same grey-scale backdrop; only a constant was added to the model input.
+(a) Reference labels, dominated by a tongue of medium floe. (b) With the input darkened by
+0.7~z-units (about 4~dB), the tongue is read as open water and the medium-floe IoU for this
+scene falls from 0.76 to 0.03. (c) Unmodified input. (d) Brightened by the same amount.
+Nothing about the ice has changed.}
+\label{fig:radiometric}
+\end{figure}
+
+The second failure mode concerns the \emph{structure} of the decision. The
+baseline is markedly weaker on big floe than on either open water or vast floe
+(IoU 0.650 against 0.969 and 0.870 respectively, fold~0). Only 65.8\% of
+big-floe pixels are recovered: 16.7\% are read as medium floe and 1.5\% as small
+floe, while a further 15.5\% are absorbed into vast floe. The errors therefore
+run in both directions along the scale axis --- part of a large floe is read as a
+field of smaller ones, and part of it is merged into the class above. A pixel
+deep inside a big floe has, at fine scale, much the local texture of a field of
+small floes, and at coarse scale little to distinguish it from a vast floe;
+placing it correctly requires the two scales to be read against one another.
+When each scale branch is weighted independently and nothing couples them,
+neither comparison is available. Taken together, the two failure modes
+point at a single structural deficiency: the evidence on which the per-pixel
+scale decision rests is both \emph{contaminated}, by scene radiometry, and
+\emph{isolated}, by the absence of cross-scale coordination.
+
+We address this with a single design principle, which we call
+\emph{evidence--decision decoupling}: quantities that are physically grounded
+and stable under changes in scene radiometry serve as scale evidence; the
+per-pixel scale decision is conditioned on that evidence; and the evidence
+enters the network only as a conditioning variable, never in parallel with the
+main feature path. We instantiate it with three mechanisms. (i)
+\emph{Contrast-invariant texture evidence}: a differentiable variogram profile
+which, after normalisation across lags, is invariant to affine radiometric
+transformations $f \mapsto af+b$ and retains only correlation length, that is,
+texture coarseness. (ii) A \emph{polarimetric prior}: the HH$-$HV difference in
+dB --- a ratio in linear units --- used as a calibration-light fingerprint of
+the scattering mechanism. (iii) \emph{Cross-scale communication and an
+evidence-conditioned competitive scale gate}: at each pixel the four scale
+features first exchange information through a single scale-axis transformer
+layer, after which a budget-conserving softmax gate distributes a fixed scale
+budget among them, conditioned on the evidence. The two projections through
+which these modules act on the network --- the output of the scale-axis
+transformer and the final layer of the gate --- are zero-initialized, so at the
+start of training the forward pass is bit-for-bit identical to the baseline; whatever they contribute comes from learning and not
+from a perturbation of the initialisation.
+
+Our contributions are the following.
+\begin{itemize}
+\item \textbf{Problem formulation.} We formulate SAR floe size segmentation as
+      per-pixel scale inference, and use diagnostic probes to identify
+      radiometric contamination of the scale evidence and the absence of
+      cross-scale coordination as the two principal sources of failure.
+\item \textbf{Method.} We propose PGSG (Physics-Guided Scale Gating), an
+      evidence--decision decoupled architecture combining contrast-invariant
+      texture evidence, a polarimetric prior, and a budget-conserving,
+      evidence-conditioned scale gate.
+\item \textbf{Component-level attribution that can be read.} Every added module
+      acts on the network through a zero-initialized projection and is
+      instrumented with training-time readouts --- the
+      gate budget distribution, the activation share contributed by the evidence
+      at the gate input, and the residual norm ratio of the scale-axis
+      transformer. Whether a module \emph{is used} and whether it \emph{helps}
+      can therefore be judged separately, which is what allows us to report both
+      positive and negative outcomes.
+\end{itemize}
+On fold~0, macro mIoU rises from 0.5031 to 0.5109. The largest single-class gain
+is on big floe ($+0.026$), where the fragmentation described above is partly
+repaired; the hard ice classes improve only slightly, and medium floe does not
+improve at all. [TODO: five-fold paired result.]
+
+%% =====================================================================
+\section{Related Work}
+\label{sec:related}
+%% =====================================================================
+
+\subsection{SAR sea-ice retrieval and ice-chart automation}
+
+Automated interpretation of SAR for operational ice charting has been driven in
+recent years by the AI4Arctic Sea Ice Challenge dataset and the AutoICE
+challenge, which posed sea ice concentration (SIC), stage of development (SOD)
+and floe size (FLOE) as three parallel segmentation tasks over Sentinel-1 scenes
+paired with ice charts from the Greenland and Canadian ice services
+\citep{stokholm2024autoice,buushinkler2023rttai4arctic}.
+Submissions converged on multi-task U-Net variants with task-specific heads and
+auxiliary inputs \citep{chen2024mmseaice}. Earlier deep-learning work on
+Sentinel-1 sea ice concentrated on ice type classification from patch-wise
+convolutional networks trained against expert charts
+\citep{boulze2020classification}. A recent re-analysis of the AutoICE benchmark
+used spatial cross-validation and attribution methods to show that
+high-scoring solutions can rely on geospatial encoding to a degree that does not
+survive transfer to regions outside the benchmark split
+\citep{jalayer2025enhancing}.
+
+FSD retrieval proper has developed along a separate track, on imagery an order
+of magnitude finer than EW-mode SAR. The classical pipeline is ice--water
+segmentation followed by separation of touching floes, using thresholding with
+manual correction \citep{toyota2006characteristics,toyota2011size}, distance
+transforms and watershed with rule-based boundary revalidation
+\citep{hwang2017practical}, or active contours driven by gradient vector flow
+\citep{zhang2015imageprocessing}; more recently, classical segmentations have
+been used to label training data for deep instance segmentation
+\citep{zhang2023icefloe}. What these approaches share is a dependence on
+resolution fine enough to delineate individual floes. On the processed 80~m
+grid used here for Sentinel-1 EW imagery that assumption does not hold, and per-pixel FLOE
+segmentation at this resolution has attracted little dedicated methodology; the
+prevailing practice is to reuse general-purpose segmentation networks.
+
+\subsection{Semantic segmentation and multi-scale fusion}
+
+Modern semantic segmentation descends from fully convolutional networks
+\citep{long2015fcn} and encoder--decoder designs with skip connections
+\citep{ronneberger2015unet}, with context aggregated by dilated convolution and
+spatial pyramid pooling \citep{chen2018deeplab} or by maintaining high-resolution
+representations throughout the network \citep{wang2021hrnet}. Transformer
+backbones have since become standard, either through hierarchical windowed
+attention \citep{liu2021swin} or through a hierarchical encoder paired with a
+lightweight all-MLP decoder \citep{xie2021segformer}.
+
+How multi-scale features are combined falls broadly into two paradigms. The
+first concatenates features from several strides with fixed weights and fuses
+them with a learned projection; the all-MLP head of \citet{xie2021segformer} is
+a representative case. The second selects among scales adaptively, weighting
+each scale per pixel through an attention mechanism
+\citep{chen2016attentiontoscale}, choosing among kernels of different receptive
+field \citep{li2019sknet}, or generating input-dependent convolution weights
+\citep{chen2020dynamicconv}. What is common to the adaptive family is that the
+input to the selection mechanism is the feature tensor itself. Whatever
+confounds the features therefore also confounds the selection --- which is
+precisely the gap the evidence-conditioning in this work is aimed at.
+
+\subsection{Physical priors and invariant representations in SAR}
+
+Polarimetric ratios and decompositions are long-established descriptors of
+sea-ice scattering. Co- and cross-polarised ratios separate open water from ice
+types with thresholds that are comparatively stable across acquisitions
+\citep{geldsetzer2009seaice}, and the broader family of polarimetric parameters
+and their sea-ice applications has been reviewed by \citet{shokr2023polarimetric}.
+The incidence-angle dependence of backscatter is itself ice-type dependent and
+differs between co- and cross-polarised channels, which is why explicit
+normalisation schemes have been developed \citep{aldenhoff2020incidence}.
+
+Texture statistics under speckle form a second strand. Grey-level co-occurrence
+features \citep{haralick1973textural} remain the most widely used descriptors for
+SAR sea ice \citep{clausi2001comparison}; notably, \citet{shokr1991evaluation}
+already modified individual co-occurrence parameters so as to be invariant under
+linear grey-tone transformations, which is the same concern that motivates the
+texture evidence in this work. Geostatistical descriptors offer a more direct
+route to spatial scale: variogram (structure function) analysis characterises
+surface roughness and correlation length \citep{garrigues2007variograms}, and has
+been applied to sea ice both for classifying ice provinces
+\citep{herzfeld2016geostatistical} and for estimating ice concentration and floe
+scale from SAR intensity through fitted stochastic models
+\citep{wang2016variograms}. Scattering transforms provide a related construction
+with explicit invariance guarantees \citep{bruna2013scattering}. Speckle sets a
+lower bound on the scales at which any of this is meaningful, since it behaves as
+multiplicative noise concentrated at the finest scales
+\citep{lee1981speckle,lee1981refined,argenti2013tutorial}.
+
+A third strand addresses generalization across acquisition conditions directly,
+through adversarial alignment of domain representations \citep{ganin2016dann},
+contrastive pre-training \citep{chen2020simclr}, or evaluation protocols that
+respect spatial structure and thereby avoid optimistic estimates from leakage
+between correlated samples \citep{roberts2017crossvalidation,jalayer2025enhancing}.
+
+Across these strands, physical quantities are almost always consumed as
+\emph{additional input channels}. Using one as a conditioning variable that
+steers a decision mechanism, while deliberately keeping it out of the main
+representation path, is much less common, and it is the position this work takes.
+%% [TODO: PA^2-Swin. Add the one-sentence lineage statement here once the
+%%  formal reference is available.]
+
+%% =====================================================================
+\section{Data and Pre-processing}
+\label{sec:data}
+%% =====================================================================
+
+\subsection{Dataset}
+
+The dataset comprises 417 Sentinel-1 EW GRDM scenes in dual-polarisation HH/HV
+(1SDH), acquired between April 2022 and June 2026. During SNAP terrain
+correction, the imagery is resampled to an output grid with 80~m pixel
+spacing. This is the processed grid spacing used in this study, not the
+native product pixel spacing or a claim of 80~m spatial resolution.
+Training and validation use this same grid without further scene
+downsampling. Sensors are Sentinel-1A (342 scenes) and Sentinel-1C (75 scenes).
+Geographically the dataset is anchored in East Greenland --- Cape Farewell,
+Central East and South East, with Danish Meteorological Institute regional ice
+charts as the label source --- and supplemented with 19 Canadian Arctic scenes
+(Beaufort Sea, Canadian Arctic Archipelago, Hudson Bay) carrying ice charts of
+the AI4Arctic lineage, added to broaden the coverage of the large floe classes.
+%% [TODO] Insert the per-region breakdown of labelled pixels by class here. Do
+%% NOT assert that the big and vast floe classes come predominantly from the
+%% Canadian Arctic: with 19 of 417 scenes from that region, the claim is not
+%% supported by anything measured so far and must wait for the breakdown.
+Seasonally the dataset is uneven: 59 winter, 187 spring, 159 summer and
+12 autumn scenes. Table~\ref{tab:dataset} summarises the composition. The
+dataset was assembled for this work and is not a public release.
+
+\begin{table}[t]
+\centering
+\caption{Dataset composition. Class pixel shares are computed over labelled
+pixels only, excluding the ignore class. The regional split of the class shares
+is not yet quantified and is therefore not asserted in the text.}
+\label{tab:dataset}
+\begin{tabular}{llr}
+\toprule
+Attribute & Value & Count \\
+\midrule
+Scenes        & total                            & 417 \\
+Sensor        & Sentinel-1A                      & 342 \\
+              & Sentinel-1C                      & 75 \\
+Region        & East Greenland                   & 398 \\
+              & Canadian Arctic                  & 19 \\
+Season        & winter                           & 59 \\
+              & spring                           & 187 \\
+              & summer                           & 159 \\
+              & autumn                           & 12 \\
+\midrule
+Class share   & open water                       & [TODO] \\
+              & cake ice                         & [TODO] \\
+              & small floe                       & [TODO] \\
+              & medium floe                      & [TODO] \\
+              & big floe                         & [TODO] \\
+              & vast floe                        & [TODO] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Labels}
+
+Labels are derived from SIGRID-3 ice-chart polygons \citep{jcomm2010sigrid3}
+rasterised onto the SAR grid, with the official floe-size codes mapped onto the
+six classes of Section~\ref{sec:intro}. Each polygon is assigned its dominant
+floe form, accepted when total concentration is at least 60\% and the dominant
+form accounts for at least 65\% of the ice; these thresholds are looser than is
+customary, chosen to retain recall on small and medium floes inside the marginal
+ice zone. Land, SAR border regions, ambiguous polygons and fast ice are assigned
+the ignore index 255 and are excluded from both loss and evaluation.
+
+One property of this supervision governs much of the method that follows: the
+label is constant across a polygon. It is regional supervision, not
+floe-by-floe delineation, and it carries no information about individual floe
+boundaries. What a model can learn from it is the texture scale characteristic
+of a region, not the detection of single floes --- which is also why the
+evidence constructed in Section~\ref{sec:method} takes the form of regional
+statistics rather than instance-level features.
+
+\subsection{SNAP processing chain}
+
+Scenes were processed with the Microwave Toolbox (version 12.0.1) of ESA SNAP
+\citep{esa2025snap} in the following order.
+\begin{enumerate}
+\item \textbf{Orbit correction.} Sentinel Precise orbit state vectors,
+      automatically downloaded, polynomial degree 3.
+\item \textbf{Thermal noise removal.}
+\item \textbf{GRD border noise removal.} Border limit 500, trim threshold 0.5.
+\item \textbf{Radiometric calibration} to $\sigma^0$ in linear units.
+\item \textbf{Speckle filtering.} Refined Lee \citep{lee1981refined}, filter
+      size $3\times3$, window $7\times7$, target window $3\times3$, with the
+      equivalent number of looks estimated from the data.
+\item \textbf{Terrain correction.} Copernicus 90~m Global DEM (COP-DEM GLO-90)
+      \citep{opentopography2021copdem}, bilinear resampling of both DEM and
+      image, output pixel spacing 80~m. The ellipsoidal incidence angle is
+      retained as an output band.
+\item \textbf{Conversion to dB.}
+\item \textbf{Invalid pixels} set to $-9999$.
+\item \textbf{GLCM texture} \citep{haralick1973textural} computed on HH:
+      probabilistic quantiser, 64 grey levels, $11\times11$ window,
+      displacement 2, averaged over all four directions; contrast,
+      dissimilarity and homogeneity are retained.
+\end{enumerate}
+The incidence angle band used downstream is the \emph{ellipsoidal} incidence
+angle, not the local incidence angle.
+
+\subsection{Input channels and normalisation}
+\label{sec:channels}
+
+The network input has seven channels: HH and HV in dB, clipped to
+$[-35, 5]$; the ellipsoidal incidence angle; the three GLCM texture bands; and
+the polarisation ratio HH$-$HV, derived online. Continuous channels are
+standardised with a single global mean and standard deviation per channel,
+computed once over the whole archive; invalid pixels are set to zero after
+standardisation.
+
+We use global rather than per-scene standardisation by design, not as a result
+of an experimental comparison. The absolute radiometric level carries genuine
+discriminative information --- open water and ice differ in mean backscatter ---
+and per-scene standardisation would remove that information along with the
+nuisance variation. The strategy pursued here is instead to keep the absolute
+level available to the main path while supplying the decision mechanism with
+evidence that is invariant to it.
+
+\subsection{Sampling, splits and evaluation protocol}
+\label{sec:splits}
+
+\paragraph{Tile-weighted sampling.} Each scene is indexed into $512\times512$
+tiles aligned with the storage chunking, and $256\times256$ patches are cropped
+from within them. Sampling probabilities over tiles are obtained by iterative
+proportional fitting \citep{deming1940leastsquares} so that the
+\emph{pixel-level} class composition of a batch approaches a target mixture
+(open water 0.15, cake ice 0.10, and 0.1875 for each of the four remaining ice
+classes), which counteracts the strong class imbalance of the archive. Tile
+histograms are weighted by the coverage kernel induced by patch cropping, so
+that the fitted probabilities refer to the pixels a batch actually sees rather
+than to whole-tile contents.
+
+\paragraph{Augmentation.} [TODO: augmentation list, per the training
+configuration.]
+
+\paragraph{Cross-validation.} Scenes are split with a grouped five-fold scheme.
+Groups are formed by taking the transitive closure of two relations --- same
+sensor and same relative orbit with adjacent frames, and acquisition start times
+within 2~hours --- which collapses the 417 scenes into 292 groups and prevents
+a scene and its neighbouring frames from straddling the train/validation
+boundary \citep{roberts2017crossvalidation}. Folds are then balanced on the
+six-class pixel shares, the scene count and the number of Sentinel-1C scenes,
+giving 83--84 scenes per fold, 15 Sentinel-1C scenes per fold, and per-class
+pixel shares within 17--22\% of the archive values. The fold assignment file is
+frozen and shared by all experiments reported here. The experiments reported
+in the present manuscript use fold~0: 334 scenes for training and 83 disjoint
+scenes for validation, together covering all 417 scenes. The validation scenes
+are used for checkpoint selection and early stopping as well as for the
+reported validation metrics; they are not an independent test set. Table~\ref{tab:folds}
+reports the resulting balance.
+
+\begin{table}[t]
+\centering
+\caption{Balance check on the five-fold grouped split.}
+\label{tab:folds}
+\begin{tabular}{lcccc}
+\toprule
+Fold & Scenes & Sentinel-1C & Groups & Six-class share range \\
+\midrule
+0 & 83 & 15 & [TODO] & [TODO] \\
+1 & [TODO] & 15 & [TODO] & [TODO] \\
+2 & [TODO] & 15 & [TODO] & [TODO] \\
+3 & [TODO] & 15 & [TODO] & [TODO] \\
+4 & [TODO] & 15 & [TODO] & [TODO] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Validation and inference.} Validation uses non-overlapping
+$256\times256$ tiles; only tiles containing valid labels are passed forward.
+Confusion matrices are accumulated per scene and all metrics are derived from
+the aggregated confusion matrix, so that metrics are independent of scene size
+and are not subject to any cap on the number of pixels evaluated. The reported
+metrics are macro mIoU over the six classes with index 255 ignored, macro-F1,
+and the hard-ice diagnostic defined in Section~\ref{sec:intro}. The checkpoint
+retained is the one maximising a moving average of mIoU over the three most
+recent validations, with early stopping after 20 validations without
+improvement. The moving average is part of the evaluation protocol rather than a
+result: selecting on a single validation peak would bias the reported value
+upward by picking a favourable fluctuation.
+
+A limitation of the design should be stated here and is returned to in
+Section~\ref{sec:limitations}. The archive is geographically concentrated: 398
+of 417 scenes come from East Greenland, so any correlation between class and
+region that does exist cannot be broken by the split. Grouped cross-validation
+prevents leakage between a scene and its neighbouring frames, but it cannot
+remove a correlation that is built into the sampling of the archive itself.
+%% [TODO] Once the per-region class pixel breakdown is available, state the
+%% actual degree of class/region correlation here. The earlier working
+%% assumption -- small/medium from East Greenland, big/vast from the Canadian
+%% Arctic -- is not currently supported and must not be reinstated without it.
+
+%% =====================================================================
+\section{Method}
+\label{sec:method}
+%% =====================================================================
+
+\subsection{Problem formulation and overview}
+
+Let $x \in \mathbb{R}^{7 \times H \times W}$ denote the input tensor of
+Section~\ref{sec:channels}. The task is to predict a label
+$y(u) \in \{0,\dots,5\}$ at every pixel $u$, where class $c$ corresponds to a
+floe size interval $[l_c, u_c]$ on the physical scale axis. Framed as scale
+inference, the model must estimate a characteristic scale of the neighbourhood
+of $u$ and map it into one of those intervals.
+
+The backbone is a MiT-B2 encoder \citep{xie2021segformer} initialised from
+ImageNet \citep{deng2009imagenet}, producing features at strides
+$\{4, 8, 16, 32\}$. Each is projected to 256 channels and upsampled to stride~4,
+giving $S=4$ aligned scale features. These pass through a scale-axis transformer
+layer, then through an evidence-conditioned scale gate, and are concatenated
+(1024 channels) and fused by a $1\times1$ convolution with batch normalisation
+and ReLU before the classification head.
+
+Two evidence streams run alongside the main path. The stride-4 encoder feature
+feeds the variogram module (Section~\ref{sec:variogram}), producing 64 channels;
+the polarisation ratio channel of the input feeds the polarimetric branch
+(Section~\ref{sec:polar}), producing 32 channels. Their concatenation is the
+evidence tensor $E \in \mathbb{R}^{96 \times H/4 \times W/4}$.
+
+The central design principle is that $E$ reaches only the decision modules ---
+the evidence token of the scale-axis transformer and the input of the gate ---
+and is never added to, or concatenated with, the main feature path. This is what
+we mean by evidence--decision decoupling, and the constraint at the end of
+Section~\ref{sec:variogram} follows from it. Figure~\ref{fig:arch} shows the two
+paths in separate colours, together with the two zero-initialized projections.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig3_architecture.pdf}
+\caption{PGSG. The main feature path (blue) runs from the input through the MiT-B2 encoder to
+four scale features, which exchange information in a scale-axis transformer and are then
+weighted by a budget-conserving softmax gate before fusion. The evidence path (red, dashed)
+supplies the variogram profile and the polarimetric prior to the two decision modules only;
+it never joins the main feature path. Circled zeros mark the two zero-initialized projections,
+which make the forward pass at initialisation identical to the baseline.}
+\label{fig:arch}
+\end{figure}
+
+\subsection{Contrast-invariant texture evidence}
+\label{sec:variogram}
+
+The stride-4 encoder feature is first projected by a $1\times1$ convolution to
+$G=16$ scalar fields $f$. For each lag $r \in \{1,2,4,8,16\}$ --- corresponding
+to 320~m, 640~m, 1.28~km, 2.56~km and 5.12~km on the ground --- a local
+structure function is computed over an $11\times11$ window $\mathcal{W}(u)$:
+\begin{equation}
+\gamma_r(u) \;=\;
+\frac{1}{|\mathcal{W}(u)|}\sum_{v \in \mathcal{W}(u)}
+\frac{1}{4}\sum_{d \in \{\pm r e_h,\; \pm r e_w\}}
+\bigl(f(v) - f(v+d)\bigr)^2 .
+\label{eq:variogram}
+\end{equation}
+The profile is then normalised across lags and clipped,
+\begin{equation}
+v_r(u) \;=\; \operatorname{clamp}\!\left(
+\log\bigl(\gamma_r(u) + \epsilon\bigr)
+- \log\Bigl(\tfrac{1}{|R|}\textstyle\sum_{r' \in R} \gamma_{r'}(u) + \epsilon\Bigr),
+\; -6,\; 6 \right),
+\label{eq:vprofile}
+\end{equation}
+where $R$ is the set of lags and $\epsilon$ a numerical stabiliser.
+
+\paragraph{Invariance.} Let $f \mapsto af + b$ with $a \neq 0$. Differencing
+removes the offset, so $\gamma_r \mapsto a^2\gamma_r$ for every lag
+simultaneously. Up to $\epsilon$, each log term in \eqref{eq:vprofile} is
+shifted by $2\log|a|$, and the shift cancels against the normaliser, so
+$v$ is unchanged. The profile therefore discards amplitude entirely and keeps
+only shape --- where $\gamma$ approaches its sill as a function of lag, which is
+a dense estimate of the correlation length. Correlation length is exactly what
+distinguishes small from medium from big floe, and amplitude is exactly the
+quantity that varies by several dB between scenes for reasons unrelated to floe
+size. The construction is thus targeted at motivation~B of
+Section~\ref{sec:intro}. The concern is not new --- \citet{shokr1991evaluation}
+modified co-occurrence parameters for invariance under linear grey-tone
+transformations three decades ago --- but three things here are: the estimator
+is differentiable and trained end to end; it retains a \emph{profile} over lags
+rather than collapsing to a scalar; and it is used to condition a decision
+rather than as an input feature.
+
+Fig.~\ref{fig:variogram} illustrates both halves of this statement: the raw
+structure function of a given class is displaced by the radiometric level of the
+scene, while the normalised profile is unchanged by the same transformation.
+
+\paragraph{Design choices.} Three details are argued from first principles
+rather than from an experimental comparison. Displacements are taken
+symmetrically in four directions so that the estimator is equivariant under
+flips and its measurement centre does not drift. A single fixed $11\times11$
+window is shared by all lags, so that every lag is estimated under the same
+noise budget and differences along the profile reflect the signal rather than
+the estimator. The smallest lag is 320~m rather than one pixel, because speckle
+behaves as multiplicative noise dominating the finest scales
+\citep{lee1981speckle,argenti2013tutorial}; a one-pixel lag would measure mostly
+speckle, and the texture signal would be buried.
+
+The profile is projected to 64 channels by a $1\times1$ / $3\times3$ mixing
+block. It is \emph{not} added as a residual to the main features; it serves only
+as evidence for the gate and the scale-axis transformer. This follows from the
+decoupling principle: placed in parallel with the main path, the evidence would
+compete with the gate for the same representational bandwidth, and its role as a
+clean conditioning signal would be lost.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig4_variogram.pdf}
+\caption{The construction of Section~\ref{sec:variogram} applied to the $4\times$-pooled HH
+channel, which shares the 320~m grid of the stride-4 encoder features on which the module
+actually operates. Lines are class medians over ten near-pure tiles (nine for vast floe), each
+taken from a different scene; shading is the interquartile range. (a) The raw structure
+function. The spread within a class is large and the classes overlap, because the amplitude is
+set mainly by the radiometric level of the scene; an affine change $f \mapsto af+b$ (coloured
+dashed) displaces a profile bodily. (b) After normalisation across lags, the transformed
+profiles (black dashed) coincide with the originals to $4\times10^{-5}$, so only the shape
+survives. The median profiles then order monotonically with floe size---steepest for small floe
+and flattest for big and vast floe, which are indistinguishable at these lags---although the
+per-tile ranges still overlap.}
+\label{fig:variogram}
+\end{figure}
+
+\subsection{Polarimetric prior}
+\label{sec:polar}
+
+The second evidence stream is the polarisation ratio $p = \mathrm{HH} -
+\mathrm{HV}$ in dB, which is a ratio in linear units. It is average-pooled
+$4\times4$ to stride~4, which suppresses residual speckle, and passed through
+two $3\times3$ convolutions with batch normalisation and ReLU to give 32
+channels.
+
+Physically, $p$ responds to the difference in scattering mechanism between
+specular open water, level ice and deformed ice, for which co- and
+cross-polarised returns behave differently \citep{geldsetzer2009seaice,
+shokr2023polarimetric}. Taking a difference in dB cancels multiplicative
+common-mode terms, so the quantity is comparatively insensitive to absolute
+calibration. It also attenuates, though it does not remove, the incidence-angle
+dependence: the angular slope of backscatter is itself polarisation- and
+ice-type-dependent, so a residual angular term survives the difference
+\citep{aldenhoff2020incidence}. We therefore treat $p$ as a
+calibration-light, not calibration-free, descriptor.
+
+\subsection{Cross-scale communication}
+\label{sec:xscale}
+
+The motivation is the fragmentation described as motivation~C in
+Section~\ref{sec:intro}. Under purely per-scale weighting, the fine-scale branch
+has no way of knowing that the pixel it is describing lies inside a single large
+floe, so the ridges and internal texture of that floe are read as a field of
+small or medium floes. The remedy is to let the scales talk to each other before
+they are weighted.
+
+At every pixel, the $S=4$ scale features (256 channels each) are projected by a
+linear map to $d=64$ and treated as four tokens; a fifth token is formed from
+the evidence tensor $E$ by a $1\times1$ convolution to 64 channels. Learnable
+scale embeddings are added, and the five tokens pass through a single pre-LN
+transformer layer with four attention heads and an MLP ratio of 2. The four
+scale tokens are read back and mapped by a zero-initialized linear layer
+$64 \to 256$, which is added as a residual to the corresponding scale feature.
+The sequence length is five, so the layer is cheap despite being applied at
+every pixel. [TODO: measured parameter and FLOP increment of this layer; see
+also Section~\ref{sec:training} for the whole-model figure.]
+
+Attention is implemented with batched matrix multiplications rather than a fused
+attention kernel, because one sequence per pixel produces a number of sequences
+beyond the grid limits such kernels assume.
+
+\subsection{Evidence-conditioned competitive scale gate}
+\label{sec:gate}
+
+The concatenated scale features $X$ (1024 channels) and the evidence $E$ (96
+channels) are concatenated to 1120 channels and passed through a $1\times1$
+convolution to 64 channels with batch normalisation and ReLU, a $3\times3$
+convolution with the same width and normalisation, and a final $1\times1$
+convolution producing $S=4$ logits $a_s(u)$. The gate values are
+\begin{equation}
+g_s(u) \;=\; S \cdot \operatorname{softmax}_s\bigl(a(u)\bigr),
+\qquad \sum_{s=1}^{S} g_s(u) \equiv S ,
+\label{eq:gate}
+\end{equation}
+so the total gate budget is conserved at every pixel. $X$ is then multiplied
+block-wise by the corresponding $g_s$ before the fusion convolution.
+
+The budget constraint is a design decision, argued as follows rather than
+established experimentally. The softmax form means that raising one scale
+necessarily lowers another: the module's only degree of freedom is to
+\emph{choose among} scales. It cannot uniformly amplify or attenuate all scales
+at once, and that excluded degree of freedom has no counterpart in the task
+semantics --- a per-pixel scale inference problem has nothing to say about
+overall gain --- while it would add capacity that noise could exploit.
+Constraining the module to the operation the task actually calls for is the
+conservative choice.
+
+The final convolution of the gate is zero-initialized, so $a \equiv 0$ and
+$g \equiv 1$ at initialisation and the gated fusion is identical to ungated
+concatenation.
+
+\subsection{Training and the zero-initialisation discipline}
+\label{sec:training}
+
+The loss is six-class cross-entropy with index 255 ignored. Optimisation uses
+AdamW \citep{loshchilov2019adamw} with discriminative learning rates ---
+$10^{-5}$ for the encoder, $10^{-4}$ for the decoder head and all added modules
+--- mixed precision with gradient scaling, and gradient clipping at 5.0. An
+epoch is 300 batches of size 16; training runs for at most 200 epochs with the
+early stopping and checkpoint selection of Section~\ref{sec:splits}.
+[TODO: hardware, wall-clock time per fold, total parameter count, and the
+parameter and FLOP increment of the full model over the baseline, i.e.\ the
+scale-axis transformer, the two evidence streams and the gate combined.]
+
+The zero-initialisation discipline deserves a statement of its own, because the
+component-level attribution claimed in Section~\ref{sec:intro} rests on it. The
+final projection of the scale-axis transformer and the final convolution of the
+gate --- the two points at which the added modules act on the network --- are
+zero-initialized. At $t=0$ the forward pass of every variant is therefore
+bit-for-bit identical to the baseline, a property verified by automated
+assertions rather than by inspection. In addition, all added modules are
+constructed after the encoder and the decoder head, so that under a fixed random
+seed the weights shared between variants are bit-for-bit identical as well.
+Together these two properties mean that the difference between any two
+ablation variants originates in training dynamics alone: the single-variable
+comparison holds at the level of the implementation, not merely by intent.
+
+\subsection{Readouts for component-level attribution}
+\label{sec:readouts}
+
+To make both positive and negative outcomes decidable, four quantities are
+logged during training: the distribution of the gate budget across scales and
+its selection entropy; the share of the activation at the gate input
+attributable to the evidence channels; the ratio of the residual norm added by
+the scale-axis transformer to the norm of the scale features it is added to; and
+the fraction of variogram profile entries hitting the clamp bounds of
+\eqref{eq:vprofile}.
+
+These readouts separate two questions that are otherwise easy to conflate:
+whether a module \emph{is being used} by the trained network, and whether it
+\emph{improves} the metric. A module can be heavily used and still not help; a
+module that is not used at all cannot be blamed for a null result, and the
+correct conclusion in that case concerns optimisation rather than design. The
+attribution in the ablation refers back to these readouts. Their numerical
+values belong to the ablation and are not reported here.
+
+%% =====================================================================
+%%  SKELETON SECTIONS -- not part of the current drafting scope
+%% =====================================================================
+
+\section{Experimental setup}
+\label{sec:experiments}
+
+Five configurations are compared. (a) The \emph{baseline} is the MiT-B2 encoder
+with the projection-and-fusion decoder of Section~\ref{sec:method} and no added
+modules. (b) adds the two evidence streams and the evidence-conditioned scale
+gate, but not cross-scale communication. (c) is the full PGSG model, that is
+(b) with the scale-axis transformer of Section~\ref{sec:xscale}. Two further
+configurations are probes rather than candidate components: (d) adds to (b) an
+adversarial scene-alignment objective of the domain-adversarial type
+\citep{ganin2016dann}, and (e) adds to (c) a polarimetric bias attention module.
+[TODO: one or two sentences of implementation detail for (d) and (e), sufficient
+for a reader to reproduce the probes.]
+
+All five share the training recipe of Section~\ref{sec:training}, the same
+random seed, and the frozen fold assignment of Section~\ref{sec:splits}. Because
+of the zero-initialisation discipline, the forward pass of every configuration
+at $t=0$ is bit-for-bit that of the baseline, and the weights shared between
+configurations are bit-for-bit identical; differences between rows therefore
+originate in training dynamics rather than in initialisation.
+
+All model-comparison results reported below are measured on the fold~0
+validation set (83 scenes), using models trained on the other 334 scenes,
+with metrics derived from the confusion matrix aggregated over those
+validation scenes as described in Section~\ref{sec:splits}. The separate
+training-scene evaluation in Section~\ref{sec:intro} uses all 334 training
+scenes only to diagnose the training--validation gap; those scenes are not
+included in the reported validation scores. We note the restriction explicitly
+because it governs how the numbers may be read: the five-fold aggregate is a
+different evaluation set, and its absolute values are not comparable with the
+fold-0 values quoted below. Every comparison in this paper is therefore made
+within fold~0.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{The main chain}
+
+Table~\ref{tab:ablation} reports the ablation. Reading the main chain
+incrementally is more informative than reading the endpoints alone, because the
+two additions do different things and one partly compensates for the other.
+
+Adding the evidence streams and the gate, (a)~$\rightarrow$~(b), moves macro
+mIoU from 0.5031 to 0.5009 --- a change of $-0.002$, which on its own would
+suggest the module does nothing useful. The aggregate hides a redistribution.
+Small floe rises from 0.220 to 0.238 ($+0.018$) and the hard-ice diagnostic from
+0.2243 to 0.2343 ($+0.010$), the highest hard-ice value anywhere in the table;
+meanwhile big floe falls by 0.010 and vast floe by 0.021. Conditioning the
+per-pixel scale decision on radiometry-invariant evidence therefore buys
+accuracy on the hard classes, and pays for it on the large ones. That is
+consistent with what the mechanism is built to do, and it also shows what it
+does not do: conditioning alone leaves the large-floe fragmentation of
+motivation~C untouched, and indeed makes it slightly worse.
+
+Adding cross-scale communication, (b)~$\rightarrow$~(c), moves macro mIoU from
+0.5009 to 0.5109 ($+0.010$). The gain is concentrated precisely on the classes
+(b) had given up: big floe $+0.036$ and vast floe $+0.025$. The hard classes
+return a little of their gain (small floe $-0.007$, hard-ice $-0.004$). The
+pattern is what the mechanism predicts --- a pixel inside a large floe can only
+be recognised as such from the coarse scale, and the scale-axis layer is what
+lets that information reach the fine branch --- but we note that the pattern is
+consistent with the mechanism rather than proof of it.
+
+End to end, (a)~$\rightarrow$~(c) gives $+0.008$ macro mIoU, from 0.5031 to
+0.5109. The decomposition is uneven: big floe $+0.026$, the largest single-class
+gain in the study; small floe $+0.011$; cake ice $+0.007$; vast floe $+0.004$;
+open water $-0.001$, which is no material degradation of an already saturated
+class; and medium floe unchanged. The hard-ice diagnostic improves by $0.006$.
+
+\begin{table}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\caption{Ablation on fold~0 (83 validation scenes, metrics derived from the
+aggregated confusion matrix). Per-class values are IoU. Hard-ice is the mean of
+the small-floe and medium-floe IoU, a diagnostic quantity defined in this work.}
+\label{tab:ablation}
+\begin{tabular}{@{}p{0.30\linewidth}cccccccc@{}}
+\toprule
+ & macro & \multicolumn{6}{c}{IoU by class} & hard- \\
+\cmidrule(lr){3-8}
+Configuration & mIoU & water & cake & small & medium & big & vast & ice \\
+\midrule
+(a) Baseline
+  & 0.5031 & 0.969 & 0.081 & 0.220 & 0.229 & 0.650 & 0.870 & 0.2243 \\[2pt]
+(b) + evidence-conditioned scale gate
+  & 0.5009 & 0.970 & 0.078 & 0.238 & 0.231 & 0.640 & 0.849 & 0.2343 \\[2pt]
+\textbf{(c) PGSG (full): (b) + cross-scale communication}
+  & \textbf{0.5109} & 0.968 & 0.088 & 0.231 & 0.229 & 0.676 & 0.874 & 0.2302 \\
+\midrule
+\multicolumn{9}{@{}l}{\emph{Additional probes}} \\
+(d) (b) + adversarial scene alignment
+  & 0.4815 & 0.951 & 0.067 & 0.188 & 0.251 & 0.587 & 0.845 & 0.2198 \\[2pt]
+(e) (c) + polarimetric bias attention
+  & 0.5103 & 0.969 & 0.088 & 0.233 & 0.206 & 0.700 & 0.866 & 0.2193 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The structure of the errors}
+
+Figure~\ref{fig:confusion} shows the row-normalised confusion matrices. The
+errors are not spread arbitrarily over the class set: they concentrate in the
+band adjacent to the diagonal, so a misassigned pixel usually lands on a
+neighbouring interval of the scale axis rather than on an unrelated class. That
+is the behaviour of a model estimating a scale and quantising it, and it is the
+most direct support this study offers for the formulation of
+Section~\ref{sec:intro}.
+
+The two ends of the axis are effectively solved, open water and vast floe being
+recovered at 98--99\%, while cake, small and medium floe exchange pixels
+heavily. In the baseline, medium floe is recalled at 40.4\% with 38.1\% of its
+pixels assigned to small floe: very nearly as many medium-floe pixels are read
+as small floe as are read correctly. For big floe the baseline recovers 65.8\%,
+sending 16.7\% to medium floe, 15.5\% to vast floe and 1.5\% to small floe. This
+sharpens the description given in Section~\ref{sec:intro}. The loss on big floe
+is not fragmentation into small floe, which accounts for very little of it; it
+is a roughly even division between reading a large floe as a finer class and
+absorbing it into the class above. Both are failures to localise a scale, and
+both are consistent with scale branches that decide without reference to one
+another, but only the first is fragmentation.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig5_confusion.pdf}
+\caption{Row-normalised confusion matrices on fold~0 (percentage of each true class's pixels).
+Confusion is concentrated in the band adjacent to the diagonal: errors move a class to its
+neighbour on the scale axis rather than to an arbitrary class. Open water and vast floe are
+essentially solved (98--99\%), while cake, small and medium floe exchange pixels heavily.}
+\label{fig:confusion}
+\end{figure}
+
+\subsection{What does not improve}
+
+Medium floe stands at 0.229 in the baseline and 0.229 in the full model. No
+configuration on the main chain moves it, and the gate configuration that
+improves the hard classes most, (b), moves it by $+0.002$. The bottleneck
+identified as motivation~B in Section~\ref{sec:intro} --- medium floe
+generalising poorly across scenes --- is therefore diagnosed by this work and
+not resolved by it. We state this plainly rather than absorbing medium floe into
+the hard-ice average, where a $+0.018$ gain on small floe would otherwise mask
+it.
+
+Cake ice remains very low throughout, rising only from 0.081 to 0.088. As set
+out in Section~\ref{sec:data}, cake ice occupies few pixels and is heavily
+confused with small floe; it is reported for completeness and is not a target of
+this work.
+
+\subsection{Additional probes}
+
+We also examined two further modules, and found neither worth retaining.
+
+We examined adding an adversarial scene-alignment objective on top of (b),
+configuration (d), on the reasoning that if the failure is one of cross-scene
+generalization then aligning scene representations should help. It does not:
+macro mIoU falls to 0.4815, nearly 0.02 below (b), with lower IoU in five of the
+six classes, including open water (0.951) and big floe (0.587). The single
+exception is medium floe, which reaches 0.251 --- the highest value anywhere in
+the table. We record that observation without building on it. It comes from one
+fold, in a configuration that is worse almost everywhere else, and we have no
+established account of the mechanism that would produce it.
+[TODO: readouts for (d), if they bear on the interpretation.]
+
+We also examined a polarimetric bias attention module on top of (c),
+configuration (e). Its macro mIoU is 0.5103 against 0.5109 for (c): no net
+change. What it does instead is move error between classes. Big floe rises to
+0.700, the highest in the table, while medium floe falls to 0.206 and the
+hard-ice diagnostic to 0.2193, both the lowest in the table. A module that adds
+parameters and redistributes error without a net gain, in a study whose stated
+concern is the hard classes, has nothing to recommend it, and it was removed.
+
+Neither probe is part of PGSG. We report both because the design of
+Section~\ref{sec:readouts} was intended to make negative outcomes decidable
+rather than merely unpublished.
+
+\subsection{Component-level readouts}
+
+Figure~\ref{fig:readouts} reports the readouts of Section~\ref{sec:readouts}
+over training. They answer whether a module is used, which is a different
+question from whether it helps, and here the two answers do not agree.
+
+The gate starts from $g \equiv 1$ on all four scales, as the zero-initialisation
+requires, and ends with mean gate values of 1.14, 1.13, 1.02 and 0.71 from the
+finest scale to the coarsest. Its selection entropy falls from 1.386 to 1.316
+against a uniform upper bound of 1.386. The gate is therefore doing something
+systematic, and what it does is a mild, consistent re-weighting away from the
+coarsest scale rather than a per-pixel choice among scales; an entropy 0.07
+below the uniform bound is a long way from selective allocation, and we quote
+the bound alongside the value because the vertical axis of the panel is
+magnified.
+
+The cross-scale path is used more heavily. The residual added by the scale-axis
+transformer grows from zero to 0.493 of the norm of the features it is added to,
+which is consistent with that module producing the largest single-class change
+in the study. Inside the layer, the evidence token draws 0.235 of the attention
+mass against a uniform share of 0.200, so the evidence is attended to somewhat
+more than a neutral token would be.
+
+The remaining readout runs against this paper's account of its own method. The
+share of the gate's input activation contributed by the evidence channels falls
+from 0.394 early in training to 0.045 at the end. On that measure the trained
+gate is driven almost entirely by the main features, and the evidence
+conditioning from which the method takes its name has largely faded out of the
+gate by the time training finishes --- even though the evidence remains in use
+inside the scale-axis transformer. We report it because the readouts were
+introduced precisely so that an outcome of this kind would be visible rather
+than invisible, and we return to it in Section~\ref{sec:discussion}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig6_readouts.pdf}
+\caption{Training-time readouts of the added modules (logarithmic axis; readouts are logged at
+geometrically spaced intervals). The gate starts from $g \equiv 1$, confirming the
+zero-initialisation, and settles into a mild preference against the coarsest scale. The
+cross-scale residual grows from zero to about half the norm of the scale features, so the
+communication path is used. The share of the gate's input activation contributed by the
+evidence decreases over training.}
+\label{fig:readouts}
+\end{figure}
+
+\subsection{Qualitative comparison}
+
+Figure~\ref{fig:qualitative} shows two fold-0 validation scenes. In the first, a
+marginal-ice-zone scene, the reference has a band of medium floe near the coast
+grading into small floe further out; the baseline reads most of the band as
+small floe, and PGSG recovers a large part of it, with pixel agreement over the
+displayed window rising from 0.700 to 0.808. The second is a failure case and is
+shown as one. The reference there is uniformly big floe, and both models read it
+as vast floe interspersed with patches of small floe; PGSG produces fewer such
+patches, 0.170 agreement against 0.093, but both remain far from the reference.
+The second scene is a useful corrective to the aggregate numbers: a class-mean
+IoU of 0.676 on big floe is compatible with individual scenes on which the model
+is wrong almost everywhere.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig7a_qualitative_hardclasses.pdf}\\[2pt]
+\includegraphics[width=\linewidth]{fig7b_qualitative_bigfloe.pdf}
+\caption{Qualitative comparison on two fold-0 validation scenes. Top: a marginal-ice-zone scene
+in which the baseline reads most of the medium-floe band as small floe and PGSG recovers a
+large part of it (pixel agreement over the displayed window 0.700 versus 0.808). Bottom: a
+failure case in which the reference is uniformly big floe and both models read it as vast floe
+interspersed with patches of small floe; PGSG produces fewer such patches, but both remain far
+from the reference (0.093 versus 0.170).}
+\label{fig:qualitative}
+\end{figure}
+
+\subsection{Scope of the evidence}
+
+The differences discussed above are of order 0.01 or smaller in macro mIoU and
+are measured on a single fold. They are consistent in sign and in their
+class-wise structure with the mechanisms that produce them, which is the main
+reason we regard them as more than noise; but a single fold cannot establish
+that, and we do not claim it does. Table~[TODO] reports the paired five-fold
+comparison between PGSG and the baseline, which is the measurement that settles
+the question. Until then the reader should treat the fold-0 ordering as
+indicative.
+
+
+%% [TODO Table 4: five-fold paired comparison, PGSG vs baseline. Report the
+%% per-fold difference, then the mean and standard error over the five paired
+%% differences. Until this exists, every comparison in the paper stays inside
+%% fold 0. Once it exists, fold-0 values and five-fold aggregate values still
+%% must not be placed side by side as if comparable: they are different
+%% evaluation sets.]
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Two failure modes, two mechanisms, and the tension between them}
+
+The ablation separates cleanly along the lines the problem formulation
+predicted. Evidence conditioning acts on the hard classes and costs accuracy on
+the large ones; cross-scale communication acts on the large classes and returns
+a little of the hard-class gain. Each mechanism moves the classes its motivation
+named, which is the strongest support the fold-0 data can offer for the
+formulation of Section~\ref{sec:intro}.
+
+The interesting part is that the two are not simply additive. Configuration (b)
+reaches a higher hard-ice value than the full model, and the full model reaches
+a higher macro mIoU than either. One reading is that the gate and the scale-axis
+layer compete for the same decision budget: once coarse-scale context is allowed
+to reach the fine branch, pixels that the gate had assigned to a fine scale on
+textural evidence are reassigned to a coarser one, which is exactly the
+behaviour that repairs large-floe fragmentation and exactly the behaviour that
+would cost a few hard-class pixels. We offer this as an interpretation, not as a
+result. The readouts rule out the simplest alternative --- that one of the two
+modules is inert --- since the gate departs measurably from uniform and the
+cross-scale residual reaches roughly half the norm of the features it modifies.
+What they do not show is that the reassignment described above is what the two
+modules are trading, and we have not designed a probe that would. Should it hold, the practical
+consequence is that the two mechanisms are better understood as a choice about
+where to spend the scale budget than as independent improvements to be stacked.
+
+\subsection{Why medium floe may lie outside the reach of the present evidence}
+
+Medium floe does not move. Our design parameters suggest one candidate
+explanation, which we set out because it is checkable rather than because the
+present experiments establish it.
+
+The variogram evidence is computed on stride-4 features, so its smallest lag is
+320~m on the ground. The small--medium class boundary is at 100~m, and the whole
+small-floe class spans 20--100~m. Every lag in the profile is therefore coarser
+than the distinction the classifier most needs to draw. The profile can speak to
+that distinction only indirectly, through how a field of such floes aggregates
+at scales of 320~m and above. That the gate nonetheless improves small floe by
+0.018 suggests the indirect route carries some information; that medium floe
+does not move at all suggests it carries less where the two classes must be
+separated from each other.
+
+This is not a defect that a smaller lag would obviously repair, which is why we
+do not present it as a fix. The lower bound on the lag was chosen for a reason
+(Section~\ref{sec:variogram}): speckle is multiplicative noise concentrated at
+the finest scales, so a lag near one pixel measures speckle rather than texture.
+The design is caught between a noise floor from below and a class boundary from
+above, and the interval between them is narrow at 80~m pixel spacing. Whether
+finer-resolution imagery would widen it is a question this work cannot answer,
+since it uses EW-mode data throughout.
+
+Figure~\ref{fig:variogram} bears on this directly. The normalised class medians
+do order monotonically with floe size, so the profile carries scale information.
+But the interquartile ranges of the four classes overlap over most of the lag
+range, and the big-floe and vast-floe medians very nearly coincide. Two of the
+six classes are thus close to indistinguishable in this evidence at the lags
+available, and the separation that does exist between small and medium floe is a
+separation of medians inside heavily overlapping distributions. The evidence is
+genuine and its invariance is exact, but on the present grid it is not sharp.
+
+Two further possibilities deserve listing without being ranked. Supervision is
+polygon-constant (Section~\ref{sec:data}), so a medium-floe polygon labels a
+region whose interior may contain a range of floe sizes; the ceiling on medium
+floe may partly be a property of the labels rather than of the model. And the
+archive is geographically concentrated, so the held-out scenes for medium floe
+may differ from the training scenes in ways that no amount of radiometric
+invariance addresses.
+
+\subsection{What the negative probes suggest}
+
+Adversarial scene alignment is the standard response to a diagnosis of
+cross-scene generalization failure, and here it degrades almost every class. One
+explanation consistent with the dataset is that scene identity is not a pure
+nuisance variable in this archive: scenes differ by region and season, and those
+differences carry genuine information about which floe size classes are present
+at all. Removing what distinguishes scenes therefore removes signal along with
+noise. If that is right, the useful move is the one PGSG makes --- neutralising
+a specific, named nuisance factor, namely absolute radiometric level, by
+constructing evidence that is invariant to it --- rather than aligning scene
+representations wholesale. We advance this as an account of the observation, not
+as something the experiment demonstrates; distinguishing the two would require
+probes that separate radiometric from compositional differences between scenes.
+
+The polarimetric bias attention probe produced no net change while moving error
+between classes. A plausible reading is that polarimetric information already
+enters the network twice --- as an input channel (Section~\ref{sec:channels})
+and as evidence (Section~\ref{sec:polar}) --- so a third pathway adds capacity
+without adding information. Again, the readouts are what would settle this.
+
+\subsection{The evidence stops driving the gate}
+
+The most uncomfortable result in this study is a readout rather than a metric.
+The share of the gate's input activation contributed by the evidence decays from
+0.394 to 0.045 over training, while inside the scale-axis transformer the
+evidence token holds slightly above a uniform share of the attention mass. Taken
+at face value, the gate --- the module through which evidence conditioning is
+meant to act --- ends up driven almost entirely by the main features, which are
+the very features the evidence was introduced to bypass.
+
+Two readings are available and we cannot separate them with what we have. The
+first is that the gate's main-feature input already carries the information the
+evidence supplies, having learned it during training, in which case the evidence
+is redundant at that site and the hard-class gain of configuration (b) has some
+other origin than the one the method's name asserts. The second is that the
+decay is an artefact of optimisation: 96 evidence channels concatenated with
+1024 feature channels are a small share of the gate input to begin with, and
+nothing in the objective rewards keeping them influential, so the pathway may
+simply be abandoned by gradient descent regardless of its merit.
+
+The two readings call for different remedies --- the first would mean the gate
+is the wrong site for conditioning, the second that the conditioning must be
+protected, for instance by giving the evidence its own normalised pathway into
+the gate or by an auxiliary term that penalises its disuse. Distinguishing them
+is the clearest single target we can name for further work. We raise it here
+rather than leave it to a reader to notice, because the readouts that expose it
+were part of the design.
+
+\subsection{Beyond this task}
+
+The principle that organises the method --- construct evidence that is invariant
+to a named nuisance factor, and let it condition the decision mechanism rather
+than join the representation --- is not specific to floe size. It applies
+wherever a label set is defined by a physical quantity that the sensor measures
+only indirectly, and where the nuisance factors are known and nameable. What the
+present study offers on that point is modest but concrete: an instantiation in
+which the invariance is exact rather than learned, the conditioning path is
+architecturally separated from the main path, and the zero-initialisation
+discipline makes the contribution of each part separately decidable.
+
+\section{Limitations}
+\label{sec:limitations}
+
+\paragraph{Evaluation.} The complete ablation exists on fold~0 only. The
+differences reported are of order 0.01 or smaller in macro mIoU, which a single
+fold cannot distinguish from run-to-run variation with confidence; the paired
+five-fold comparison is the measurement that would, and it is pending
+(Table~[TODO]). Seed variability has been estimated only from two runs of the
+baseline, which differ by 0.005; that is enough to establish the scale of the
+radiometric effect discussed in Section~\ref{sec:intro} but not to serve as a
+variance estimate for the ablation. And because
+no public benchmark exists for per-pixel floe size segmentation at EW
+resolution, there is no external baseline to place these numbers against; we
+have likewise not run a backbone comparison under the present cross-validation
+protocol, so the choice of encoder is not empirically defended here.
+
+\paragraph{Data.} The archive is geographically concentrated: 398 of 417 scenes
+come from East Greenland and 19 from the Canadian Arctic. Grouped
+cross-validation prevents a scene and its neighbouring frames from straddling
+the train/validation boundary, but it cannot remove a correlation between class
+and region that is built into the sampling itself.
+%% [TODO] Once the per-region class pixel breakdown is available, quantify that
+%% correlation here. Do not restate the earlier working assumption that big and
+%% vast floe come mainly from the Canadian Arctic; it is unsupported.
+Seasonal coverage is uneven, with autumn represented by 12 scenes, so nothing
+in this work should be read as characterising autumn conditions. The dataset was
+assembled for this study and is not a public release, which limits direct
+reproduction.
+
+\paragraph{Labels.} Supervision is polygon-constant: each ice-chart polygon
+contributes a single floe size label to every pixel it covers. This is regional
+weak supervision, it contains no individual floe boundaries, and its accuracy
+depends on the dominant-form thresholds of Section~\ref{sec:data}, which we
+deliberately loosened to retain marginal-ice-zone recall. Cake ice in particular
+occupies very few pixels and is heavily confused with small floe; we report it
+but do not treat it as an optimisation target, and its IoU should not be read as
+a meaningful measurement.
+
+\paragraph{Method.} The polarimetric prior attenuates but does not remove
+incidence-angle dependence, since the angular slope of backscatter is itself
+polarisation- and ice-type-dependent \citep{aldenhoff2020incidence}; a residual
+angular term therefore survives the HH$-$HV difference. The variogram evidence
+is contrast-invariant by construction, but its invariance is to affine
+transformations of the feature field, which is a model of radiometric variation
+and not radiometric variation itself; multiplicative speckle, incidence-angle
+gradients across a swath, and thermal noise residuals are not affine and are not
+covered by the guarantee. The radiometric sensitivity probe of
+Section~\ref{sec:intro} applies a synthetic uniform shift, which is likewise a
+simplification of how scenes actually differ.
+
+\paragraph{Scope of the claim.} The central bottleneck this work set out to
+address --- cross-scene generalization on medium floe --- is diagnosed and not
+solved. The overall gain is consistent across classes in the sense that no class
+is materially degraded, but it is moderate, and it is concentrated on large
+floes rather than on the classes that motivated the study. The mechanistic
+account is incomplete as well: the readouts show the evidence contribution to
+the gate decaying over training (Section~\ref{sec:discussion}), so attributing
+the hard-class gain of configuration (b) to evidence conditioning is less secure
+than the name of the method suggests.
+
+\section{Conclusions}
+\label{sec:conclusions}
+
+%% [TODO]
+
+\section*{Acknowledgements}
+
+%% [TODO] Includes the acknowledgement wording required for the ice-chart
+%% sources.
+
+\appendix
+
+\section{[TODO: appendix title]}
+
+\bibliographystyle{elsarticle-harv}
+\bibliography{references}
+
+\end{document}
