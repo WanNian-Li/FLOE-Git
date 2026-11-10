@@ -1,6 +1,6 @@
 # FLOE-Git
 
-Sentinel-1 EW 区域主导浮冰尺寸语义分割项目。保留 SegFormer-B2 Baseline、PGSG、单次训练/评估、论文诊断及正式论文；不包含数据构建源码和五折实验流程。
+Sentinel-1 EW 区域主导浮冰尺寸语义分割项目。保留 SegFormer-B2 Baseline、PGSG、单次训练/评估、论文诊断及正式论文；另含原始 SAR 处理与标注源码，不包含五折实验流程。
 
 ## 目录
 
@@ -20,13 +20,14 @@ FLOE-Git/
 │   ├── figures/           论文制图
 │   ├── checks/            冒烟与一致性检查
 │   └── system/            资源监控
+├── preprocessing/         SAR 处理、冰图标注与归一化（见该目录 README）
 ├── configs/               非五折配置
 ├── datalists/             375/42 场景名单
 ├── docs/                  数据手册、结果与整理记录
 └── paper/                 论文源码和正式插图
 ```
 
-根目录只保留 `README.md`、`AGENTS.md`、`.gitignore`。所有 Python 工具从项目根目录以 `python -m tools.…` 执行，不直接用 `python tools/…py`；无需修改 `PYTHONPATH`。
+根目录只保留 `README.md`、`AGENTS.md`、`.gitignore`。`tools/` 下的 Python 工具从项目根目录以 `python -m tools.…` 执行，不直接用 `python tools/…py`；无需修改 `PYTHONPATH`。
 
 ## 当前入口
 
@@ -80,3 +81,7 @@ Baseline 使用对应配置和 `floe_baseline_417_s42` run 名；CM 导出为 `/
 ## 开源许可
 
 本仓库采用 MIT 许可证，见 [LICENSE](LICENSE)。已有第三方代码的版权声明应予保留，外部依赖、数据及预训练权重按各自许可使用。开源此代码库不代表发布外部数据集或模型权重。
+
+## 原始数据处理
+
+新增源码见 [preprocessing/README.md](preprocessing/README.md)。该目录以独立脚本方式调用，与 `tools/` 的模块调用方式不同。按要求不包含 SAR 下载、HH/标签绘图和 NC 统计脚本。当前已完成源码整理与静态检查，尚未执行处理流程或完成运行验证。

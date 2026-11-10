@@ -1,0 +1,12 @@
+# Direct third-party dependencies; versions have not been exported or verified.
+# Use a separate preprocessing environment with compatible GDAL/geospatial wheels.
+numpy
+pandas
+geopandas
+shapely
+rasterio
+xarray
+h5py
+h5netcdf
+requests
+# ESA SNAP and Microwave Toolbox are separate, non-pip dependencies.

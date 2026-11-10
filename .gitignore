@@ -8,3 +8,11 @@ wandb/
 *.pt
 *.nc
 .env
+
+# External preprocessing data and generated runtime state
+/data/
+/preprocessing/*.log
+/preprocessing/*.flag
+/preprocessing/*.lock
+/preprocessing/process_progress.json
+/preprocessing/auto_make_labels_resume_state.json

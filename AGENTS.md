@@ -1,6 +1,6 @@
 # FLOE-Git 工作约定
 
-- 当前范围：Baseline、PGSG、单次训练评估与论文；不包含数据构建源码及五折实验流程。未经新指令不恢复这些文件。
+- 当前范围：Baseline、PGSG、单次训练评估、论文，以及用户新增授权的 preprocessing 数据处理/标注源码；不包含五折实验流程。preprocessing 排除 SAR 下载、HH/标签绘图和 NC 统计脚本。
 - Windows 本地只编辑和静态检查，不运行 Python。训练、评估、推理及 Python 冒烟检查在服务器 `ice-binary` 环境运行。
 - 服务器连接信息须实际核实，不复用历史文档的过时端口。同步用 scp；本次本地目录整理不授权服务器部署、开关机或训练。
 - 数据仍在外部目录，配置默认 NC 为 `/root/autodl-tmp/FLOE_datanc/`，tile 索引为 `/root/autodl-tmp/floe_tile_index_417.npz`。
@@ -14,3 +14,5 @@
 - 历史论文 fold-0 指标不得标成新 375/42 配置成绩。目录中没有独立测试集，不能声称无偏独立测试表现。
 - 不改写历史日志和论文结果；修复路径与变更模型科学定义分开处理。
 - 保留 `floe/models/legacy/unet.py`、`floe/models/legacy/swin_transformer.py` 及 `floe/models/sota` 的导入依赖，移除前先修导入并验证。
+
+- preprocessing 使用直接脚本入口（python preprocessing/run_pipeline.py），运行前读该目录 README；只整理源码不代表获准执行下载、SNAP、标注或归一化。
